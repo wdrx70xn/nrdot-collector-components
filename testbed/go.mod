@@ -20,7 +20,7 @@ require (
 	go.opentelemetry.io/collector/confmap v1.56.0
 	go.opentelemetry.io/collector/confmap/provider/fileprovider v1.56.0
 	go.opentelemetry.io/collector/connector v0.150.0
-	go.opentelemetry.io/collector/consumer v1.56.0
+	go.opentelemetry.io/collector/consumer v1.57.0
 	go.opentelemetry.io/collector/consumer/consumererror v0.150.0
 	go.opentelemetry.io/collector/exporter v1.56.0
 	go.opentelemetry.io/collector/exporter/debugexporter v0.150.0
@@ -30,7 +30,7 @@ require (
 	go.opentelemetry.io/collector/extension v1.56.0
 	go.opentelemetry.io/collector/extension/zpagesextension v0.150.0
 	go.opentelemetry.io/collector/otelcol v0.150.0
-	go.opentelemetry.io/collector/pdata v1.56.0
+	go.opentelemetry.io/collector/pdata v1.57.0
 	go.opentelemetry.io/collector/pipeline v1.56.0
 	go.opentelemetry.io/collector/processor v1.56.0
 	go.opentelemetry.io/collector/processor/batchprocessor v0.150.0
@@ -354,7 +354,7 @@ require (
 	github.com/zeebo/xxh3 v1.1.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/collector v0.150.0 // indirect
-	go.opentelemetry.io/collector/client v1.56.0 // indirect
+	go.opentelemetry.io/collector/client v1.57.0 // indirect
 	go.opentelemetry.io/collector/component/componentstatus v0.150.0 // indirect
 	go.opentelemetry.io/collector/config/configauth v1.56.0 // indirect
 	go.opentelemetry.io/collector/config/configgrpc v0.150.0 // indirect
@@ -377,7 +377,7 @@ require (
 	go.opentelemetry.io/collector/extension/extensionmiddleware v0.150.0 // indirect
 	go.opentelemetry.io/collector/extension/extensiontest v0.150.0 // indirect
 	go.opentelemetry.io/collector/extension/xextension v0.150.0 // indirect
-	go.opentelemetry.io/collector/featuregate v1.56.0 // indirect
+	go.opentelemetry.io/collector/featuregate v1.57.0 // indirect
 	go.opentelemetry.io/collector/internal/componentalias v0.150.0 // indirect
 	go.opentelemetry.io/collector/internal/fanoutconsumer v0.150.0 // indirect
 	go.opentelemetry.io/collector/internal/memorylimiter v0.150.0 // indirect
