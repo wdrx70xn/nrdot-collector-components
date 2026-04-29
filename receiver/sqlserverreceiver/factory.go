@@ -1,7 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-package sqlserverreceiver // import "github.com/open-telemetry/opentelemetry-collector-contrib/receiver/sqlserverreceiver"
+package sqlserverreceiver // import "github.com/newrelic/nrdot-collector-components/receiver/sqlserverreceiver"
 
 import (
 	"context"
@@ -18,8 +18,8 @@ import (
 	"go.opentelemetry.io/collector/scraper"
 	"go.opentelemetry.io/collector/scraper/scraperhelper"
 
-	"github.com/open-telemetry/opentelemetry-collector-contrib/internal/sqlquery"
-	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/sqlserverreceiver/internal/metadata"
+	"github.com/newrelic/nrdot-collector-components/internal/sqlquery"
+	"github.com/newrelic/nrdot-collector-components/receiver/sqlserverreceiver/internal/metadata"
 )
 
 var errConfigNotSQLServer = errors.New("config was not a sqlserver receiver config")

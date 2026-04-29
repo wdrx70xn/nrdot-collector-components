@@ -20,6 +20,7 @@ body:
       - cmd/oteltestbedcol
       - exporter/nop
       - internal/common
+      - internal/sqlquery
       - internal/core
       - internal/tools
       - processor/adaptivetelemetry

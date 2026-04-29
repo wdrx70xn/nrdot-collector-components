@@ -12,7 +12,7 @@ import (
 	"go.opentelemetry.io/collector/confmap/xconfmap"
 	"go.opentelemetry.io/collector/scraper/scraperhelper"
 
-	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/sqlserverreceiver/internal/metadata"
+	"github.com/newrelic/nrdot-collector-components/receiver/sqlserverreceiver/internal/metadata"
 )
 
 func TestValidateWindows(t *testing.T) {

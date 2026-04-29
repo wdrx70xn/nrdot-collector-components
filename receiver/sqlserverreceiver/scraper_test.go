@@ -23,12 +23,12 @@ import (
 	"go.opentelemetry.io/collector/receiver/receivertest"
 	"go.uber.org/zap"
 
-	"github.com/open-telemetry/opentelemetry-collector-contrib/internal/common/testutil"
-	"github.com/open-telemetry/opentelemetry-collector-contrib/internal/sqlquery"
+	"github.com/newrelic/nrdot-collector-components/internal/common/testutil"
+	"github.com/newrelic/nrdot-collector-components/internal/sqlquery"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/golden"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/pdatatest/plogtest"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/pdatatest/pmetrictest"
-	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/sqlserverreceiver/internal/metadata"
+	"github.com/newrelic/nrdot-collector-components/receiver/sqlserverreceiver/internal/metadata"
 )
 
 func configureAllScraperMetricsAndEvents(cfg *Config, enabled bool) {

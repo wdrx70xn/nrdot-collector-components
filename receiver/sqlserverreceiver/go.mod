@@ -1,4 +1,4 @@
-module github.com/open-telemetry/opentelemetry-collector-contrib/receiver/sqlserverreceiver
+module github.com/newrelic/nrdot-collector-components/receiver/sqlserverreceiver
 
 go 1.25.0
 
@@ -7,8 +7,8 @@ require (
 	github.com/google/go-cmp v0.7.0
 	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/microsoft/go-mssqldb v1.9.6
-	github.com/open-telemetry/opentelemetry-collector-contrib/internal/common v0.150.0
-	github.com/open-telemetry/opentelemetry-collector-contrib/internal/sqlquery v0.150.0
+	github.com/newrelic/nrdot-collector-components/internal/common v0.150.0
+	github.com/newrelic/nrdot-collector-components/internal/sqlquery v0.150.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/golden v0.150.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/pdatatest v0.150.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/winperfcounters v0.150.0
@@ -137,4 +137,7 @@ retract (
 	v0.65.0
 )
 
-replace github.com/open-telemetry/opentelemetry-collector-contrib/internal/common => ../../internal/common
+replace (
+	github.com/newrelic/nrdot-collector-components/internal/common => ../../internal/common
+	github.com/newrelic/nrdot-collector-components/internal/sqlquery => ../../internal/sqlquery
+)

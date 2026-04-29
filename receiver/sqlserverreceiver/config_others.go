@@ -3,7 +3,7 @@
 
 //go:build !windows
 
-package sqlserverreceiver // import "github.com/open-telemetry/opentelemetry-collector-contrib/receiver/sqlserverreceiver"
+package sqlserverreceiver // import "github.com/newrelic/nrdot-collector-components/receiver/sqlserverreceiver"
 
 func (*Config) validateInstanceAndComputerName() error {
 	return nil
