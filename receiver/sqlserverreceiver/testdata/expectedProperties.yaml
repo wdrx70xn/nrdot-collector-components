@@ -82,5 +82,5 @@ resourceMetrics:
             name: sqlserver.database.count
             unit: '{databases}'
         scope:
-          name: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/sqlserverreceiver
+          name: github.com/newrelic/nrdot-collector-components/receiver/sqlserverreceiver
           version: latest

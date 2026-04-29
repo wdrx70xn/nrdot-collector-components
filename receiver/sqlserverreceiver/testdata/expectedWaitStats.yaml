@@ -39,7 +39,7 @@ resourceMetrics:
               isMonotonic: true
             unit: s
         scope:
-          name: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/sqlserverreceiver
+          name: github.com/newrelic/nrdot-collector-components/receiver/sqlserverreceiver
           version: latest
   - resource:
       attributes:
@@ -81,7 +81,7 @@ resourceMetrics:
               isMonotonic: true
             unit: s
         scope:
-          name: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/sqlserverreceiver
+          name: github.com/newrelic/nrdot-collector-components/receiver/sqlserverreceiver
           version: latest
   - resource:
       attributes:
@@ -123,7 +123,7 @@ resourceMetrics:
               isMonotonic: true
             unit: s
         scope:
-          name: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/sqlserverreceiver
+          name: github.com/newrelic/nrdot-collector-components/receiver/sqlserverreceiver
           version: latest
   - resource:
       attributes:
@@ -165,7 +165,7 @@ resourceMetrics:
               isMonotonic: true
             unit: s
         scope:
-          name: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/sqlserverreceiver
+          name: github.com/newrelic/nrdot-collector-components/receiver/sqlserverreceiver
           version: latest
   - resource:
       attributes:
@@ -207,7 +207,7 @@ resourceMetrics:
               isMonotonic: true
             unit: s
         scope:
-          name: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/sqlserverreceiver
+          name: github.com/newrelic/nrdot-collector-components/receiver/sqlserverreceiver
           version: latest
   - resource:
       attributes:
@@ -249,7 +249,7 @@ resourceMetrics:
               isMonotonic: true
             unit: s
         scope:
-          name: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/sqlserverreceiver
+          name: github.com/newrelic/nrdot-collector-components/receiver/sqlserverreceiver
           version: latest
   - resource:
       attributes:
@@ -291,7 +291,7 @@ resourceMetrics:
               isMonotonic: true
             unit: s
         scope:
-          name: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/sqlserverreceiver
+          name: github.com/newrelic/nrdot-collector-components/receiver/sqlserverreceiver
           version: latest
   - resource:
       attributes:
@@ -333,7 +333,7 @@ resourceMetrics:
               isMonotonic: true
             unit: s
         scope:
-          name: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/sqlserverreceiver
+          name: github.com/newrelic/nrdot-collector-components/receiver/sqlserverreceiver
           version: latest
   - resource:
       attributes:
@@ -375,7 +375,7 @@ resourceMetrics:
               isMonotonic: true
             unit: s
         scope:
-          name: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/sqlserverreceiver
+          name: github.com/newrelic/nrdot-collector-components/receiver/sqlserverreceiver
           version: latest
   - resource:
       attributes:
@@ -417,7 +417,7 @@ resourceMetrics:
               isMonotonic: true
             unit: s
         scope:
-          name: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/sqlserverreceiver
+          name: github.com/newrelic/nrdot-collector-components/receiver/sqlserverreceiver
           version: latest
   - resource:
       attributes:
@@ -459,7 +459,7 @@ resourceMetrics:
               isMonotonic: true
             unit: s
         scope:
-          name: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/sqlserverreceiver
+          name: github.com/newrelic/nrdot-collector-components/receiver/sqlserverreceiver
           version: latest
   - resource:
       attributes:
@@ -501,7 +501,7 @@ resourceMetrics:
               isMonotonic: true
             unit: s
         scope:
-          name: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/sqlserverreceiver
+          name: github.com/newrelic/nrdot-collector-components/receiver/sqlserverreceiver
           version: latest
   - resource:
       attributes:
@@ -543,7 +543,7 @@ resourceMetrics:
               isMonotonic: true
             unit: s
         scope:
-          name: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/sqlserverreceiver
+          name: github.com/newrelic/nrdot-collector-components/receiver/sqlserverreceiver
           version: latest
   - resource:
       attributes:
@@ -585,7 +585,7 @@ resourceMetrics:
               isMonotonic: true
             unit: s
         scope:
-          name: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/sqlserverreceiver
+          name: github.com/newrelic/nrdot-collector-components/receiver/sqlserverreceiver
           version: latest
   - resource:
       attributes:
@@ -627,7 +627,7 @@ resourceMetrics:
               isMonotonic: true
             unit: s
         scope:
-          name: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/sqlserverreceiver
+          name: github.com/newrelic/nrdot-collector-components/receiver/sqlserverreceiver
           version: latest
   - resource:
       attributes:
@@ -669,7 +669,7 @@ resourceMetrics:
               isMonotonic: true
             unit: s
         scope:
-          name: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/sqlserverreceiver
+          name: github.com/newrelic/nrdot-collector-components/receiver/sqlserverreceiver
           version: latest
   - resource:
       attributes:
@@ -711,7 +711,7 @@ resourceMetrics:
               isMonotonic: true
             unit: s
         scope:
-          name: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/sqlserverreceiver
+          name: github.com/newrelic/nrdot-collector-components/receiver/sqlserverreceiver
           version: latest
   - resource:
       attributes:
@@ -753,7 +753,7 @@ resourceMetrics:
               isMonotonic: true
             unit: s
         scope:
-          name: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/sqlserverreceiver
+          name: github.com/newrelic/nrdot-collector-components/receiver/sqlserverreceiver
           version: latest
   - resource:
       attributes:
@@ -795,7 +795,7 @@ resourceMetrics:
               isMonotonic: true
             unit: s
         scope:
-          name: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/sqlserverreceiver
+          name: github.com/newrelic/nrdot-collector-components/receiver/sqlserverreceiver
           version: latest
   - resource:
       attributes:
@@ -837,7 +837,7 @@ resourceMetrics:
               isMonotonic: true
             unit: s
         scope:
-          name: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/sqlserverreceiver
+          name: github.com/newrelic/nrdot-collector-components/receiver/sqlserverreceiver
           version: latest
   - resource:
       attributes:
@@ -879,7 +879,7 @@ resourceMetrics:
               isMonotonic: true
             unit: s
         scope:
-          name: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/sqlserverreceiver
+          name: github.com/newrelic/nrdot-collector-components/receiver/sqlserverreceiver
           version: latest
   - resource:
       attributes:
@@ -921,7 +921,7 @@ resourceMetrics:
               isMonotonic: true
             unit: s
         scope:
-          name: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/sqlserverreceiver
+          name: github.com/newrelic/nrdot-collector-components/receiver/sqlserverreceiver
           version: latest
   - resource:
       attributes:
@@ -963,7 +963,7 @@ resourceMetrics:
               isMonotonic: true
             unit: s
         scope:
-          name: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/sqlserverreceiver
+          name: github.com/newrelic/nrdot-collector-components/receiver/sqlserverreceiver
           version: latest
   - resource:
       attributes:
@@ -1005,5 +1005,5 @@ resourceMetrics:
               isMonotonic: true
             unit: s
         scope:
-          name: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/sqlserverreceiver
+          name: github.com/newrelic/nrdot-collector-components/receiver/sqlserverreceiver
           version: latest

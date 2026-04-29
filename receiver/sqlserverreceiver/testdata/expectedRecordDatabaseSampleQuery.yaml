@@ -142,5 +142,5 @@ resourceLogs:
             timeUnixNano: "1748221338306918262"
             traceId: 0af7651916cd43dd8448eb211c80319c
         scope:
-          name: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/sqlserverreceiver
+          name: github.com/newrelic/nrdot-collector-components/receiver/sqlserverreceiver
           version: latest
