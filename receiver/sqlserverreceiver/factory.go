@@ -55,7 +55,7 @@ func createDefaultConfig() component.Config {
 	cfg.CollectionInterval = 10 * time.Second
 	return &Config{
 		ControllerConfig:     cfg,
-		MetricsBuilderConfig: metadata.NewDefaultMetricsBuilderConfig(),
+		MetricsBuilderConfig: metadata.DefaultMetricsBuilderConfig(),
 		LogsBuilderConfig:    metadata.DefaultLogsBuilderConfig(),
 		QuerySample: QuerySample{
 			MaxRowsPerQuery: 100,

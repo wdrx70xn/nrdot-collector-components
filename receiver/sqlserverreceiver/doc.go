@@ -6,6 +6,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-//go:generate make mdatagen
+//go:generate mdatagen metadata.yaml
 
 package sqlserverreceiver // import "github.com/newrelic/nrdot-collector-components/receiver/sqlserverreceiver"

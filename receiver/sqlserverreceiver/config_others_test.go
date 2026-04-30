@@ -29,7 +29,7 @@ func TestValidateOtherOS(t *testing.T) {
 		{
 			desc: "valid config",
 			cfg: &Config{
-				MetricsBuilderConfig: metadata.NewDefaultMetricsBuilderConfig(),
+				MetricsBuilderConfig: metadata.DefaultMetricsBuilderConfig(),
 				ControllerConfig:     scraperhelper.NewDefaultControllerConfig(),
 			},
 			expectedSuccess: true,
@@ -37,7 +37,7 @@ func TestValidateOtherOS(t *testing.T) {
 		{
 			desc: "valid config with no metric settings",
 			cfg: &Config{
-				MetricsBuilderConfig: metadata.NewDefaultMetricsBuilderConfig(),
+				MetricsBuilderConfig: metadata.DefaultMetricsBuilderConfig(),
 				ControllerConfig:     scraperhelper.NewDefaultControllerConfig(),
 			},
 			expectedSuccess: true,
@@ -50,7 +50,7 @@ func TestValidateOtherOS(t *testing.T) {
 		{
 			desc: "valid config with both names set",
 			cfg: &Config{
-				MetricsBuilderConfig: metadata.NewDefaultMetricsBuilderConfig(),
+				MetricsBuilderConfig: metadata.DefaultMetricsBuilderConfig(),
 				ControllerConfig:     scraperhelper.NewDefaultControllerConfig(),
 				ComputerName:         "ComputerName",
 				InstanceName:         "InstanceName",
@@ -60,7 +60,7 @@ func TestValidateOtherOS(t *testing.T) {
 		{
 			desc: "valid config with instance_name but not computer_name",
 			cfg: &Config{
-				MetricsBuilderConfig: metadata.NewDefaultMetricsBuilderConfig(),
+				MetricsBuilderConfig: metadata.DefaultMetricsBuilderConfig(),
 				ControllerConfig:     scraperhelper.NewDefaultControllerConfig(),
 				InstanceName:         "InstanceName",
 			},
@@ -69,7 +69,7 @@ func TestValidateOtherOS(t *testing.T) {
 		{
 			desc: "valid config with computer_name but not instance_name",
 			cfg: &Config{
-				MetricsBuilderConfig: metadata.NewDefaultMetricsBuilderConfig(),
+				MetricsBuilderConfig: metadata.DefaultMetricsBuilderConfig(),
 				ControllerConfig:     scraperhelper.NewDefaultControllerConfig(),
 				ComputerName:         "ComputerName",
 			},
@@ -78,7 +78,7 @@ func TestValidateOtherOS(t *testing.T) {
 		{
 			desc: "valid config with both instance and computer name",
 			cfg: &Config{
-				MetricsBuilderConfig: metadata.NewDefaultMetricsBuilderConfig(),
+				MetricsBuilderConfig: metadata.DefaultMetricsBuilderConfig(),
 				ControllerConfig:     scraperhelper.NewDefaultControllerConfig(),
 				ComputerName:         "ComputerName",
 				InstanceName:         "InstanceName",
