@@ -13,7 +13,7 @@ require (
 	go.opentelemetry.io/collector/receiver v1.57.1-0.20260501001745-24aecacf1c04
 	go.opentelemetry.io/collector/receiver/receivertest v0.151.1-0.20260501001745-24aecacf1c04
 	go.uber.org/goleak v1.3.0
-	go.uber.org/zap v1.27.1
+	go.uber.org/zap v1.28.0
 )
 
 require (
