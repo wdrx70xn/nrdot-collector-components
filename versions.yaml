@@ -14,6 +14,7 @@ module-sets:
       - github.com/newrelic/nrdot-collector-components/internal/sqlquery
       - github.com/newrelic/nrdot-collector-components/processor/adaptivetelemetryprocessor
       - github.com/newrelic/nrdot-collector-components/receiver/nopreceiver
+      - github.com/newrelic/nrdot-collector-components/receiver/postgresqlreceiver
       - github.com/newrelic/nrdot-collector-components/receiver/sqlserverreceiver
       - github.com/newrelic/nrdot-collector-components/testbed
 

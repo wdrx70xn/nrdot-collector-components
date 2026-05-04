@@ -9,5 +9,6 @@ internal/sqlquery internal/sqlquery
 internal/tools internal/tools
 processor/adaptivetelemetryprocessor processor/adaptivetelemetry
 receiver/nopreceiver receiver/nop
+receiver/postgresqlreceiver receiver/postgresql
 receiver/sqlserverreceiver receiver/sqlserver
 testbed testbed

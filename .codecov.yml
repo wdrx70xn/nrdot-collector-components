@@ -39,6 +39,10 @@ component_management:
     name: receiver_nop
     paths:
     - receiver/nopreceiver/**
+  - component_id: receiver_postgresql
+    name: receiver_postgresql
+    paths:
+    - receiver/postgresqlreceiver/**
   - component_id: receiver_sqlserver
     name: receiver_sqlserver
     paths:

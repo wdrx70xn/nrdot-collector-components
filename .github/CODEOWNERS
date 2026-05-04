@@ -27,6 +27,7 @@ internal/sqlquery/                    @newrelic/otelcomm @newrelic/dbi
 internal/tools/                       @newrelic/otelcomm
 processor/adaptivetelemetryprocessor/ @newrelic/otelcomm @newrelic/dbi @newrelic/ohai
 receiver/nopreceiver/                 @newrelic/otelcomm
+receiver/postgresqlreceiver/          @newrelic/otelcomm @newrelic/dbi
 receiver/sqlserverreceiver/           @newrelic/otelcomm @newrelic/dbi
 testbed/                              @newrelic/otelcomm
 
