@@ -19,6 +19,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/pdatatest/pmetrictest"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
 	"github.com/tj/assert"
@@ -31,7 +32,6 @@ import (
 
 	"github.com/newrelic/nrdot-collector-components/internal/common/testutil"
 	"github.com/newrelic/nrdot-collector-components/internal/coreinternal/scraperinttest"
-	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/pdatatest/pmetrictest"
 	"github.com/newrelic/nrdot-collector-components/receiver/postgresqlreceiver/internal/metadata"
 )
 
