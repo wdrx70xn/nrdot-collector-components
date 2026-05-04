@@ -11,6 +11,7 @@ package sqlserverreceiver // import "github.com/newrelic/nrdot-collector-compone
 import (
 	_ "embed"
 	"fmt"
+	"slices"
 	"strings"
 )
 
@@ -404,6 +405,27 @@ var sqlServerQuerySamples string
 
 func getSQLServerQuerySamplesQuery() string {
 	return sqlServerQuerySamples
+}
+
+//go:embed templates/sqlServerIdleBlockerQuerySample.tmpl
+var sqlServerIdleBlockingQuerySamples string
+
+func getSQLServerIdleBlockingSessionsQuery() string {
+	return sqlServerIdleBlockingQuerySamples
+}
+
+func formatSQLServerSessionIDsParam(sessionIDs map[int64]struct{}) string {
+	idValues := make([]int64, 0, len(sessionIDs))
+	for sessionID := range sessionIDs {
+		idValues = append(idValues, sessionID)
+	}
+	slices.Sort(idValues)
+
+	filterParts := make([]string, 0, len(idValues))
+	for _, sessionID := range idValues {
+		filterParts = append(filterParts, fmt.Sprintf("%d", sessionID))
+	}
+	return strings.Join(filterParts, ",")
 }
 
 // Conditional check based on Azure SQL DB v/s the rest aka (Azure SQL Managed instance OR On-prem SQL Server)
