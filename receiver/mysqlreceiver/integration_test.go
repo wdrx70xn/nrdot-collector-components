@@ -34,8 +34,9 @@ import (
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest/observer"
 
-	"github.com/newrelic/nrdot-collector-components/internal/coreinternal/scraperinttest"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/pdatatest/pmetrictest"
+
+	"github.com/newrelic/nrdot-collector-components/internal/coreinternal/scraperinttest"
 	"github.com/newrelic/nrdot-collector-components/receiver/mysqlreceiver/internal/metadata"
 )
 
