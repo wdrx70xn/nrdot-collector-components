@@ -6,5 +6,6 @@ internal/common
 internal/coreinternal
 internal/tools
 processor/adaptivetelemetryprocessor
+receiver/mysqlreceiver
 receiver/nopreceiver
 testbed

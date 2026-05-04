@@ -16,5 +16,6 @@ components:
     - internal/coreinternal
     - internal/tools
     - processor/adaptivetelemetry
+    - receiver/mysql
     - receiver/nop
     - testbed

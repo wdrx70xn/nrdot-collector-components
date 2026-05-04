@@ -35,6 +35,10 @@ component_management:
     name: processor_adaptivetelemetry
     paths:
     - processor/adaptivetelemetryprocessor/**
+  - component_id: receiver_mysql
+    name: receiver_mysql
+    paths:
+    - receiver/mysqlreceiver/**
   - component_id: receiver_nop
     name: receiver_nop
     paths:
