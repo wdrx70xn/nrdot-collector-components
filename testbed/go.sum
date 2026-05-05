@@ -970,6 +970,8 @@ go.opentelemetry.io/collector/config/configmiddleware v1.56.0 h1:PTQhboRdmsPe86o
 go.opentelemetry.io/collector/config/configmiddleware v1.56.0/go.mod h1:gcAYUR2E5+E0ekPHcbbj0bMQ7ZlLiei4mjrbUTuAAsY=
 go.opentelemetry.io/collector/config/confignet v1.56.0 h1:WlCAEZELhtSWxZGkNq5des2jezLFfSO/ria+pnr04Jw=
 go.opentelemetry.io/collector/config/confignet v1.56.0/go.mod h1:okpHzgIUQW9ga1P9PXzUsggmG1woR1rYsfZGDWKAC6c=
+go.opentelemetry.io/collector/config/confignet v1.57.0 h1:X2tVVQiKo4/V/A1/4GzKPipZsdvrQdgZCfCOHIW6jo8=
+go.opentelemetry.io/collector/config/confignet v1.57.0/go.mod h1:Op+r1B/DtzXgIuKEL7/JkTqtJdL9veu2uEXvSxH3lks=
 go.opentelemetry.io/collector/config/configopaque v1.56.0 h1:/rdyPMujfPky0arIGqWrZxQMlzkPXJ4EaHrBWDBg0MY=
 go.opentelemetry.io/collector/config/configopaque v1.56.0/go.mod h1:Dtrlj1/QqoRPn2IMAfiN+ge6YCNKwtxr6pffg02BN9A=
 go.opentelemetry.io/collector/config/configoptional v1.56.0 h1:LqrRFtJQFAvdHCO3dSTX0US3xtHQodvG4c+8670UNJQ=

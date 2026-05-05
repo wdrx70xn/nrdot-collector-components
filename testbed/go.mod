@@ -14,7 +14,7 @@ require (
 	go.opentelemetry.io/collector/component v1.56.0
 	go.opentelemetry.io/collector/component/componenttest v0.150.0
 	go.opentelemetry.io/collector/config/configcompression v1.56.0
-	go.opentelemetry.io/collector/config/confignet v1.56.0
+	go.opentelemetry.io/collector/config/confignet v1.57.0
 	go.opentelemetry.io/collector/config/configoptional v1.56.0
 	go.opentelemetry.io/collector/config/configtls v1.56.0
 	go.opentelemetry.io/collector/confmap v1.56.0
