@@ -99,10 +99,11 @@ jobs:
         shell: bash
         env:
           CHANGED_GOLANG_SOURCES: ${{ needs.changedfiles.outputs.go_sources }}
-          # On Windows runners, checklicense is skipped: go list prunes build-tag-constrained
-          # modules (e.g. //go:build windows, //go:build integration) on non-Linux platforms,
-          # causing THIRD_PARTY_NOTICES.md diffs. Ubuntu is the canonical platform for license checks.
-          LINT_CMD: ${{ runner.os == 'Windows' && 'lint-no-checklicense' || 'lint' }}
+          # checklicense is skipped in scoped-tests-matrix: running go list from a component
+          # subdirectory produces a different module graph than running from the repo root,
+          # causing false THIRD_PARTY_NOTICES.md diffs on all runners. License checks are
+          # authoritative in lint-matrix which runs from the repo root.
+          LINT_CMD: lint-no-checklicense
         run: |
           make for-affected-components CMD="make $LINT_CMD test-twice"
 
