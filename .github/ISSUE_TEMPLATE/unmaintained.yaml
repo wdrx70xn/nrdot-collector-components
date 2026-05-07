@@ -26,7 +26,7 @@ body:
       - internal/tools
       - processor/adaptivetelemetry
       - receiver/nop
-      - receiver/nroracledb
+      - receiver/oracledb
       - testbed
       # End components list
 
