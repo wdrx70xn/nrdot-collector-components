@@ -27,7 +27,7 @@ body:
       - internal/tools
       - processor/adaptivetelemetry
       - receiver/nop
-      - receiver/sqlserver
+      - receiver/nrsqlserver
       - testbed
       # End components list
 
