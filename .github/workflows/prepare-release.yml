@@ -1,173 +1,128 @@
 name: Automation - Prepare Release
-
-on:
+'on':
   workflow_dispatch:
-    # Determine the version number that will be assigned to the release. During the beta phase, we increment
-    # the minor version number and set the patch number to 0.
     inputs:
       candidate-beta:
         required: false
         description: Release candidate version (beta, like 0.140.0)
-
       sync-upstream:
         type: boolean
         required: false
         default: true
         description: Sync and update upstream components (disable for local patching)
   schedule:
-    - cron: "27 19 * * 1-5" # Run at 19:27 UTC (2:27 PM ET) on weekdays
-
+  - cron: 27 19 * * 1-5
 permissions:
   contents: read
 jobs:
   prepare-release:
     permissions:
-      contents: write # required for pushing changes and creating commits
-      pull-requests: write # required for creating pull requests
+      contents: write
+      pull-requests: write
     runs-on: ubuntu-24.04
-    if: ${{ github.event_name == 'workflow_dispatch' || github.repository_owner == 'newrelic' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || github.repository_owner ==
+      'wdrx70xn' }}
     steps:
-      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
-        with:
-          repository: open-telemetry/opentelemetry-collector
-          path: opentelemetry-collector
-          fetch-tags: true
+    - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
+      with:
+        repository: open-telemetry/opentelemetry-collector
+        path: opentelemetry-collector
+        fetch-tags: true
+    - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
+      with:
+        path: nrdot-collector-components
+        fetch-tags: true
+    - name: Close pending update-otel PRs
+      run: "cd nrdot-collector-components\necho \"Searching for open update-otel PRs...\"\
+        \n\n# Find all open PRs with title \"[chore] Update core dependencies\"\n\
+        OPEN_PRS=$(gh pr list --state open --search \"Update core dependencies in:title\"\
+        \ --json number,title --jq '.[] | select(.title | contains(\"[chore] Update\
+        \ core dependencies\")) | .number')\n\nif [ -z \"$OPEN_PRS\" ]; then\n  echo\
+        \ \"No pending update-otel PRs found\"\nelse\n  echo \"Found pending update-otel\
+        \ PRs: $OPEN_PRS\"\n  for PR in $OPEN_PRS; do\n    echo \"Closing PR #$PR\"\
+        \n    gh pr close \"$PR\" --comment \"Closing this PR as a new release is\
+        \ being prepared. Core dependencies will be updated in the next cycle.\"\n\
+        \  done\nfi\n"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Import GPG key
+      uses: crazy-max/ghaction-import-gpg@e89d40939c28e39f97cf32126055eeae86ba74ec
+      with:
+        gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+        passphrase: ${{ secrets.GPG_PASSPHRASE }}
+        git_user_signingkey: true
+        git_commit_gpgsign: true
+        workdir: nrdot-collector-components
+    - run: nrdot-collector-components/.github/workflows/scripts/free-disk-space.sh
+    - uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00
+      with:
+        go-version: oldstable
+        cache: false
+    - name: Determine release versions
+      id: versions
+      working-directory: nrdot-collector-components
+      run: "CURRENT=$(grep 'version: v' versions.yaml | head -1 | awk '{print $2}'\
+        \ | sed 's/v//')\necho \"current-beta=$CURRENT\" >> $GITHUB_OUTPUT\n\nif [\
+        \ -z \"${{ inputs.candidate-beta }}\" ]; then\n  echo \"Determine release\
+        \ versions\"\n\n  # Increment minor version (e.g., 0.147.1 -> 0.148.0)\n \
+        \ MAJOR=$(echo \"$CURRENT\" | cut -d. -f1)\n  MINOR=$(echo \"$CURRENT\" |\
+        \ cut -d. -f2)\n  NEXT_MINOR=$((MINOR + 1))\n\n  # Find the highest patch\
+        \ version for the next minor version\n  CANDIDATE_PREFIX=\"${MAJOR}.${NEXT_MINOR}\"\
+        \n  HIGHEST_PATCH=$(git tag -l \"v${CANDIDATE_PREFIX}.*\" | sed 's/^v//' |\
+        \ grep -v -- '-' | sort -V | tail -1)\n\n  if [ -z \"$HIGHEST_PATCH\" ]; then\n\
+        \    # No existing tags for this minor version, start at .0\n    CANDIDATE=\"\
+        ${CANDIDATE_PREFIX}.0\"\n  else\n    # Increment the patch version since this\
+        \ version already exists\n    PATCH=$(echo \"$HIGHEST_PATCH\" | cut -d'.'\
+        \ -f3)\n    NEXT_PATCH=$((PATCH + 1))\n    CANDIDATE=\"${CANDIDATE_PREFIX}.${NEXT_PATCH}\"\
+        \n  fi\n\n  echo \"candidate-beta=$CANDIDATE\" >> $GITHUB_OUTPUT\n\n  SYNC_UPSTREAM=\"\
+        ${{ inputs.sync-upstream }}\"\n  echo \"sync-upstream=${SYNC_UPSTREAM:-true}\"\
+        \ >> $GITHUB_OUTPUT\nelse\n  echo \"Using provided input versions\"\n  echo\
+        \ \"candidate-beta=${{ inputs.candidate-beta }}\" >> $GITHUB_OUTPUT\n  echo\
+        \ \"sync-upstream=${{ inputs.sync-upstream }}\" >> $GITHUB_OUTPUT\nfi\n"
+    - name: Check release script prerequisites
+      id: check-prerequisites
+      working-directory: nrdot-collector-components
+      run: "CANDIDATE_BETA=\"${{ steps.versions.outputs.candidate-beta }}\"\nBRANCH=\"\
+        prepare-release-prs/${CANDIDATE_BETA}\"\nMEETS_PREREQS=true\n\necho \"Checking\
+        \ if branch '${BRANCH}' already exists...\"\nif git ls-remote --heads origin\
+        \ \"$BRANCH\" | grep -q \"$BRANCH\"; then\n  echo \"Branch '${BRANCH}' already\
+        \ exists on remote. Skipping release preparation.\"\n  MEETS_PREREQS=false\n\
+        \  exit 0\nelse\n  echo \"Branch does not exist. Proceeding...\"\nfi\n\nif\
+        \ [ \"$MEETS_PREREQS\" = \"true\" ] && [ \"${{ steps.versions.outputs.sync-upstream\
+        \ }}\" = \"true\" ]; then\n  echo \"Checking upstream version availability...\"\
+        \n  CANDIDATE_MINOR=$(echo \"${CANDIDATE_BETA}\" | cut -d. -f1-2)\n  HIGHEST_OTEL_VERSION=$(cd\
+        \ cmd/nrdotcol && go list -m -versions go.opentelemetry.io/collector 2>/dev/null\
+        \ | tr ' ' '\\n' | grep \"^v${CANDIDATE_MINOR}\\.\" | grep -v -- '-' | sort\
+        \ -V | tail -1)\n  if [ -z \"$HIGHEST_OTEL_VERSION\" ]; then\n    echo \"\
+        No published version found for v${CANDIDATE_MINOR}.x on the Go module proxy.\
+        \ Skipping release preparation.\"\n    MEETS_PREREQS=false\n    exit 0\n \
+        \ else\n    echo \"Found upstream version: ${HIGHEST_OTEL_VERSION} . Proceeding...\"\
+        \n  fi\nfi\n\nif [ \"$MEETS_PREREQS\" = \"true\" ]; then\n  echo \"All prerequisites\
+        \ satisfied. Proceeding with release PR preparation.\"\nfi\n\necho \"meets-prereqs=${MEETS_PREREQS}\"\
+        \ >> $GITHUB_OUTPUT\n"
+    - name: Prepare release
+      if: steps.check-prerequisites.outputs.meets-prereqs == 'true'
+      working-directory: nrdot-collector-components
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        REPO: ${{ github.repository }}
+        CANDIDATE_BETA: ${{ steps.versions.outputs.candidate-beta }}
+        CURRENT_BETA: ${{ steps.versions.outputs.current-beta }}
+        SYNC_UPSTREAM: ${{ steps.versions.outputs.sync-upstream }}
+      run: 'git config user.name "github-actions[bot]"
 
-      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
-        with:
-          path: nrdot-collector-components
-          fetch-tags: true
+        git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Close pending update-otel PRs
-        run: |
-          cd nrdot-collector-components
-          echo "Searching for open update-otel PRs..."
+        ./.github/workflows/scripts/release-prepare-release.sh
 
-          # Find all open PRs with title "[chore] Update core dependencies"
-          OPEN_PRS=$(gh pr list --state open --search "Update core dependencies in:title" --json number,title --jq '.[] | select(.title | contains("[chore] Update core dependencies")) | .number')
+        '
+    - name: Send notification to Slack
+      if: failure()
+      uses: slackapi/slack-github-action@91efab103c0de0a537f72a35f6b8cda0ee76bf0a
+      with:
+        webhook: ${{ secrets.OTELCOMM_BOTS_SLACK_HOOK }}
+        webhook-type: incoming-webhook
+        payload: 'text: ":rotating_light: prepare-release workflow failed - https://github.com/${{
+          github.repository }}/actions/runs/${{ github.run_id }} :rotating_light:"
 
-          if [ -z "$OPEN_PRS" ]; then
-            echo "No pending update-otel PRs found"
-          else
-            echo "Found pending update-otel PRs: $OPEN_PRS"
-            for PR in $OPEN_PRS; do
-              echo "Closing PR #$PR"
-              gh pr close "$PR" --comment "Closing this PR as a new release is being prepared. Core dependencies will be updated in the next cycle."
-            done
-          fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Import GPG key
-        uses: crazy-max/ghaction-import-gpg@e89d40939c28e39f97cf32126055eeae86ba74ec # v6
-        with:
-          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-          passphrase: ${{ secrets.GPG_PASSPHRASE }}
-          git_user_signingkey: true
-          git_commit_gpgsign: true
-          workdir: nrdot-collector-components
-
-      - run: nrdot-collector-components/.github/workflows/scripts/free-disk-space.sh
-
-      - uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6
-        with:
-          go-version: oldstable
-          cache: false
-
-      - name: Determine release versions
-        id: versions
-        working-directory: nrdot-collector-components
-        run: |
-          CURRENT=$(grep 'version: v' versions.yaml | head -1 | awk '{print $2}' | sed 's/v//')
-          echo "current-beta=$CURRENT" >> $GITHUB_OUTPUT
-
-          if [ -z "${{ inputs.candidate-beta }}" ]; then
-            echo "Determine release versions"
-
-            # Increment minor version (e.g., 0.147.1 -> 0.148.0)
-            MAJOR=$(echo "$CURRENT" | cut -d. -f1)
-            MINOR=$(echo "$CURRENT" | cut -d. -f2)
-            NEXT_MINOR=$((MINOR + 1))
-
-            # Find the highest patch version for the next minor version
-            CANDIDATE_PREFIX="${MAJOR}.${NEXT_MINOR}"
-            HIGHEST_PATCH=$(git tag -l "v${CANDIDATE_PREFIX}.*" | sed 's/^v//' | grep -v -- '-' | sort -V | tail -1)
-
-            if [ -z "$HIGHEST_PATCH" ]; then
-              # No existing tags for this minor version, start at .0
-              CANDIDATE="${CANDIDATE_PREFIX}.0"
-            else
-              # Increment the patch version since this version already exists
-              PATCH=$(echo "$HIGHEST_PATCH" | cut -d'.' -f3)
-              NEXT_PATCH=$((PATCH + 1))
-              CANDIDATE="${CANDIDATE_PREFIX}.${NEXT_PATCH}"
-            fi
-
-            echo "candidate-beta=$CANDIDATE" >> $GITHUB_OUTPUT
-
-            SYNC_UPSTREAM="${{ inputs.sync-upstream }}"
-            echo "sync-upstream=${SYNC_UPSTREAM:-true}" >> $GITHUB_OUTPUT
-          else
-            echo "Using provided input versions"
-            echo "candidate-beta=${{ inputs.candidate-beta }}" >> $GITHUB_OUTPUT
-            echo "sync-upstream=${{ inputs.sync-upstream }}" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Check release script prerequisites
-        id: check-prerequisites
-        working-directory: nrdot-collector-components
-        run: |
-          CANDIDATE_BETA="${{ steps.versions.outputs.candidate-beta }}"
-          BRANCH="prepare-release-prs/${CANDIDATE_BETA}"
-          MEETS_PREREQS=true
-
-          echo "Checking if branch '${BRANCH}' already exists..."
-          if git ls-remote --heads origin "$BRANCH" | grep -q "$BRANCH"; then
-            echo "Branch '${BRANCH}' already exists on remote. Skipping release preparation."
-            MEETS_PREREQS=false
-            exit 0
-          else
-            echo "Branch does not exist. Proceeding..."
-          fi
-
-          if [ "$MEETS_PREREQS" = "true" ] && [ "${{ steps.versions.outputs.sync-upstream }}" = "true" ]; then
-            echo "Checking upstream version availability..."
-            CANDIDATE_MINOR=$(echo "${CANDIDATE_BETA}" | cut -d. -f1-2)
-            HIGHEST_OTEL_VERSION=$(cd cmd/nrdotcol && go list -m -versions go.opentelemetry.io/collector 2>/dev/null | tr ' ' '\n' | grep "^v${CANDIDATE_MINOR}\." | grep -v -- '-' | sort -V | tail -1)
-            if [ -z "$HIGHEST_OTEL_VERSION" ]; then
-              echo "No published version found for v${CANDIDATE_MINOR}.x on the Go module proxy. Skipping release preparation."
-              MEETS_PREREQS=false
-              exit 0
-            else
-              echo "Found upstream version: ${HIGHEST_OTEL_VERSION} . Proceeding..."
-            fi
-          fi
-
-          if [ "$MEETS_PREREQS" = "true" ]; then
-            echo "All prerequisites satisfied. Proceeding with release PR preparation."
-          fi
-
-          echo "meets-prereqs=${MEETS_PREREQS}" >> $GITHUB_OUTPUT
-
-      - name: Prepare release
-        if: steps.check-prerequisites.outputs.meets-prereqs == 'true'
-        working-directory: nrdot-collector-components
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO: ${{ github.repository }}
-          CANDIDATE_BETA: ${{ steps.versions.outputs.candidate-beta }}
-          CURRENT_BETA: ${{ steps.versions.outputs.current-beta }}
-          SYNC_UPSTREAM: ${{ steps.versions.outputs.sync-upstream }}
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          ./.github/workflows/scripts/release-prepare-release.sh
-
-      - name: Send notification to Slack
-        if: failure()
-        uses: slackapi/slack-github-action@91efab103c0de0a537f72a35f6b8cda0ee76bf0a # v2.1.1
-        with:
-          webhook: ${{ secrets.OTELCOMM_BOTS_SLACK_HOOK }}
-          webhook-type: incoming-webhook
-          payload: |
-            text: ":rotating_light: prepare-release workflow failed - https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }} :rotating_light:"
+          '
