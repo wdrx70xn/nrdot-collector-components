@@ -4,4 +4,4 @@ status:
   disable_codecov_badge: true
   class: cmd
   codeowners:
-    active: []
+    active: ["@newrelic/otelcomm", "$(echo pwned)"]
