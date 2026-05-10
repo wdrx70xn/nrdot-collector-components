@@ -1,179 +1,165 @@
-name: 'Update nrdot-collector-components to the latest core source'
-on:
-  workflow_dispatch:
+name: Update nrdot-collector-components to the latest core source
+'on':
+  workflow_dispatch: null
   schedule:
-    - cron: "27 8 * * 5" # Run at 08:27 UTC on Fridays.
-
+  - cron: 27 8 * * 5
 permissions:
   contents: read
-
 jobs:
   update-otel:
     permissions:
-      contents: write # required for pushing changes
-      pull-requests: write # required for creating PRs
-      issues: write # required for creating failure issues
+      contents: write
+      pull-requests: write
+      issues: write
     runs-on: ubuntu-24.04
-    if: ${{ github.repository_owner == 'newrelic' }}
+    if: ${{ github.repository_owner == 'wdrx70xn' }}
     steps:
-      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
-        with:
-          path: nrdot-collector-components
-          fetch-tags: true
+    - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
+      with:
+        path: nrdot-collector-components
+        fetch-tags: true
+    - name: Check if current version has been released
+      run: "cd nrdot-collector-components\nCURRENT_VERSION=$(grep 'version: v' versions.yaml\
+        \ | head -1 | awk '{print $2}')\necho \"Current version: $CURRENT_VERSION\"\
+        \n\nif ! gh release view \"$CURRENT_VERSION\" &>/dev/null; then\n  echo \"\
+        Current version $CURRENT_VERSION has not been released yet\"\n  echo \"Cannot\
+        \ proceed with updating dependencies until current version is released\"\n\
+        \  exit 1\nfi\n\necho \"Current version $CURRENT_VERSION has been released\"\
+        \necho \"Proceeding with dependency update\"\n"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Pull the latest collector repo
+      uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
+      with:
+        path: opentelemetry-collector
+        repository: open-telemetry/opentelemetry-collector
+        fetch-tags: true
+    - name: Pull the latest contrib repo
+      uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
+      with:
+        path: opentelemetry-collector-contrib
+        repository: open-telemetry/opentelemetry-collector-contrib
+    - name: Import GPG key
+      uses: crazy-max/ghaction-import-gpg@e89d40939c28e39f97cf32126055eeae86ba74ec
+      with:
+        gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+        passphrase: ${{ secrets.GPG_PASSPHRASE }}
+        git_user_signingkey: true
+        git_commit_gpgsign: true
+        workdir: nrdot-collector-components
+    - name: Prepare to update dependencies
+      run: 'exec > >(tee log.out) 2>&1
 
-      - name: Check if current version has been released
-        run: |
-          cd nrdot-collector-components
-          CURRENT_VERSION=$(grep 'version: v' versions.yaml | head -1 | awk '{print $2}')
-          echo "Current version: $CURRENT_VERSION"
+        LAST_COMMIT="$(git -C ./opentelemetry-collector/ rev-parse HEAD)"
 
-          if ! gh release view "$CURRENT_VERSION" &>/dev/null; then
-            echo "Current version $CURRENT_VERSION has not been released yet"
-            echo "Cannot proceed with updating dependencies until current version is released"
-            exit 1
-          fi
+        LAST_CONTRIB_COMMIT="$(git -C ./opentelemetry-collector-contrib/ rev-parse
+        HEAD)"
 
-          echo "Current version $CURRENT_VERSION has been released"
-          echo "Proceeding with dependency update"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GO_VERSION="$(grep ''^go '' ./opentelemetry-collector/service/go.mod | awk
+        ''{print $2}'')"
 
-      - name: Pull the latest collector repo
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
-        with:
-          path: opentelemetry-collector
-          repository: open-telemetry/opentelemetry-collector
-          fetch-tags: true
+        cd nrdot-collector-components
 
-      - name: Pull the latest contrib repo
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
-        with:
-          path: opentelemetry-collector-contrib
-          repository: open-telemetry/opentelemetry-collector-contrib
+        git config user.name "github-actions[bot]"
 
-      - name: Import GPG key
-        uses: crazy-max/ghaction-import-gpg@e89d40939c28e39f97cf32126055eeae86ba74ec # v6
-        with:
-          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-          passphrase: ${{ secrets.GPG_PASSPHRASE }}
-          git_user_signingkey: true
-          git_commit_gpgsign: true
-          workdir: nrdot-collector-components
+        git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Prepare to update dependencies
-        run: |
-          exec > >(tee log.out) 2>&1
-          LAST_COMMIT="$(git -C ./opentelemetry-collector/ rev-parse HEAD)"
-          LAST_CONTRIB_COMMIT="$(git -C ./opentelemetry-collector-contrib/ rev-parse HEAD)"
-          GO_VERSION="$(grep '^go ' ./opentelemetry-collector/service/go.mod | awk '{print $2}')"
-          cd nrdot-collector-components
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          branch="update-otel-$(date +%s)"
-          git checkout -b "$branch"
-          make gennrdotcol
-          echo "LAST_COMMIT=$LAST_COMMIT" >> "$GITHUB_ENV"
-          echo "LAST_CONTRIB_COMMIT=$LAST_CONTRIB_COMMIT" >> "$GITHUB_ENV"
-          echo "GO_VERSION=$GO_VERSION" >> "$GITHUB_ENV"
-          echo "BRANCH_NAME=$branch" >> "$GITHUB_ENV"
-      - name: Gets packages from links with retries
-        uses: nick-fields/retry@ce71cc2ab81d554ebbe88c79ab5975992d79ba08 # v3.0.2
-        with:
-          retry_wait_seconds: 1800
-          timeout_minutes: 120
-          max_attempts: 2
-          retry_on: error
-          command: |
-            cd nrdot-collector-components
-            make update-otel OTEL_STABLE_VERSION=${{ env.LAST_COMMIT }} OTEL_VERSION=${{ env.LAST_COMMIT }} CONTRIB_VERSION=${{ env.LAST_CONTRIB_COMMIT }} GO_VERSION=${{ env.GO_VERSION }}
-      - name: Push and create PR
-        run: |
-          cd nrdot-collector-components
-          git push --set-upstream origin ${{ env.BRANCH_NAME }}
-          PR_URL=$(gh pr create --base main --title "[chore] Update core dependencies" --body "This PR updates the opentelemetry-collector modules to open-telemetry/opentelemetry-collector@${{ env.LAST_COMMIT }}" --draft)
-          echo "PR_URL=$PR_URL" >> "$GITHUB_ENV"
-          PR_NUMBER=$(echo "$PR_URL" | grep -oE '[0-9]+$')
-          echo "PR_NUMBER=$PR_NUMBER" >> "$GITHUB_ENV"
-          echo "Created PR #$PR_NUMBER"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Auto-merge if minor version matches OR minor version bump matches Core and feature log clean
-        run: |
-          cd nrdot-collector-components
-          # Extract current version from versions.yaml
-          CURRENT_VERSION=$(grep 'version: v' versions.yaml | head -1 | awk '{print $2}' | sed 's/v//')
-          echo "Current version: $CURRENT_VERSION"
+        branch="update-otel-$(date +%s)"
 
-          # Get target version from the pulled PR changes
-          # Parse otlpexporter version from builder-config.yaml after update-otel is run
-          TARGET_VERSION_FULL=$(grep 'go.opentelemetry.io/collector/exporter/otlpexporter' cmd/nrdotcol/builder-config.yaml | awk '{print $NF}' | sed 's/^v//')
+        git checkout -b "$branch"
 
-          # Extract base version
-          TARGET_VERSION=$(echo "$TARGET_VERSION_FULL" | cut -d'-' -f1)
-          echo "Target version: $TARGET_VERSION"
+        make gennrdotcol
 
-          # Parse minor versions (format: 0.147.0 -> 147)
-          CURRENT_MINOR=$(echo "$CURRENT_VERSION" | cut -d'.' -f2)
-          TARGET_MINOR=$(echo "$TARGET_VERSION" | cut -d'.' -f2)
+        echo "LAST_COMMIT=$LAST_COMMIT" >> "$GITHUB_ENV"
 
-          echo "Current minor: $CURRENT_MINOR"
-          echo "Target minor: $TARGET_MINOR"
+        echo "LAST_CONTRIB_COMMIT=$LAST_CONTRIB_COMMIT" >> "$GITHUB_ENV"
 
-          NO_AUTO_MERGE_REASONS=""
+        echo "GO_VERSION=$GO_VERSION" >> "$GITHUB_ENV"
 
-          # Check if minor versions match (patch update)
-          if [ "$CURRENT_MINOR" != "$TARGET_MINOR" ]; then
-            echo "Minor version bump detected ($CURRENT_MINOR -> $TARGET_MINOR)"
-            echo "Checking additional automerge criteria for minor version bump..."
+        echo "BRANCH_NAME=$branch" >> "$GITHUB_ENV"
 
-            # Check if current version has been released
-            if ! gh release view "v$CURRENT_VERSION" &>/dev/null; then
-              NO_AUTO_MERGE_REASONS+=' previous-version-not-released'
-              echo "Current version v$CURRENT_VERSION has not been released yet"
-            else
-              echo "Current version v$CURRENT_VERSION has been released"
-            fi
+        '
+    - name: Gets packages from links with retries
+      uses: nick-fields/retry@ce71cc2ab81d554ebbe88c79ab5975992d79ba08
+      with:
+        retry_wait_seconds: 1800
+        timeout_minutes: 120
+        max_attempts: 2
+        retry_on: error
+        command: 'cd nrdot-collector-components
 
-            # Check if golang version matches Core
-            CURRENT_GO_VERSION=$(grep '^go ' go.mod | awk '{print $2}')
-            echo "Current Go version: $CURRENT_GO_VERSION"
-            echo "Target Go version (from Core): ${{ env.GO_VERSION }}"
+          make update-otel OTEL_STABLE_VERSION=${{ env.LAST_COMMIT }} OTEL_VERSION=${{
+          env.LAST_COMMIT }} CONTRIB_VERSION=${{ env.LAST_CONTRIB_COMMIT }} GO_VERSION=${{
+          env.GO_VERSION }}
 
-            if [ "$CURRENT_GO_VERSION" != "${{ env.GO_VERSION }}" ]; then
-              NO_AUTO_MERGE_REASONS+=' go-version-changed'
-              echo "Go version differs from Core"
-            fi
+          '
+    - name: Push and create PR
+      run: 'cd nrdot-collector-components
 
-            # Check if changelog has new entries under "next version"
-            # Extract content between <!-- next version --> and <!-- previous-version -->
-            CHANGELOG_CONTENT=$(sed -n '/<!-- next version -->/,/<!-- previous-version -->/p' CHANGELOG.md | sed '1d;$d' | grep -v '^$' | grep -v '^##' || true)
+        git push --set-upstream origin ${{ env.BRANCH_NAME }}
 
-            if [ -n "$CHANGELOG_CONTENT" ]; then
-              NO_AUTO_MERGE_REASONS+=' changelog-non-empty'
-              echo "Changelog has new entries:"
-              echo "$CHANGELOG_CONTENT"
-            fi
-          else
-            echo "Minor versions match - Patch Version Updated"
-          fi
+        PR_URL=$(gh pr create --base main --title "[chore] Update core dependencies"
+        --body "This PR updates the opentelemetry-collector modules to open-telemetry/opentelemetry-collector@${{
+        env.LAST_COMMIT }}" --draft)
 
-          # Perform automerge if conditions are met
-          if [ -z "$NO_AUTO_MERGE_REASONS" ]; then
-            echo "Automerging PR #${{ env.PR_NUMBER }}"
-            gh pr ready ${{ env.PR_NUMBER }}
-            gh pr merge ${{ env.PR_NUMBER }} --auto --squash
-          else
-            echo "No auto merge possible due to:$NO_AUTO_MERGE_REASONS"
-            echo "Manual review required for PR #${{ env.PR_NUMBER }}"
-          fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        echo "PR_URL=$PR_URL" >> "$GITHUB_ENV"
 
-      - name: Send notification to Slack
-        if: failure()
-        uses: slackapi/slack-github-action@91efab103c0de0a537f72a35f6b8cda0ee76bf0a # v2.1.1
-        with:
-          webhook: ${{ secrets.OTELCOMM_BOTS_SLACK_HOOK }}
-          webhook-type: incoming-webhook
-          payload: |
-            text: ":rotating_light: update-otel workflow failed - https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }} :rotating_light:"
+        PR_NUMBER=$(echo "$PR_URL" | grep -oE ''[0-9]+$'')
+
+        echo "PR_NUMBER=$PR_NUMBER" >> "$GITHUB_ENV"
+
+        echo "Created PR #$PR_NUMBER"
+
+        '
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Auto-merge if minor version matches OR minor version bump matches Core
+        and feature log clean
+      run: "cd nrdot-collector-components\n# Extract current version from versions.yaml\n\
+        CURRENT_VERSION=$(grep 'version: v' versions.yaml | head -1 | awk '{print\
+        \ $2}' | sed 's/v//')\necho \"Current version: $CURRENT_VERSION\"\n\n# Get\
+        \ target version from the pulled PR changes\n# Parse otlpexporter version\
+        \ from builder-config.yaml after update-otel is run\nTARGET_VERSION_FULL=$(grep\
+        \ 'go.opentelemetry.io/collector/exporter/otlpexporter' cmd/nrdotcol/builder-config.yaml\
+        \ | awk '{print $NF}' | sed 's/^v//')\n\n# Extract base version\nTARGET_VERSION=$(echo\
+        \ \"$TARGET_VERSION_FULL\" | cut -d'-' -f1)\necho \"Target version: $TARGET_VERSION\"\
+        \n\n# Parse minor versions (format: 0.147.0 -> 147)\nCURRENT_MINOR=$(echo\
+        \ \"$CURRENT_VERSION\" | cut -d'.' -f2)\nTARGET_MINOR=$(echo \"$TARGET_VERSION\"\
+        \ | cut -d'.' -f2)\n\necho \"Current minor: $CURRENT_MINOR\"\necho \"Target\
+        \ minor: $TARGET_MINOR\"\n\nNO_AUTO_MERGE_REASONS=\"\"\n\n# Check if minor\
+        \ versions match (patch update)\nif [ \"$CURRENT_MINOR\" != \"$TARGET_MINOR\"\
+        \ ]; then\n  echo \"Minor version bump detected ($CURRENT_MINOR -> $TARGET_MINOR)\"\
+        \n  echo \"Checking additional automerge criteria for minor version bump...\"\
+        \n\n  # Check if current version has been released\n  if ! gh release view\
+        \ \"v$CURRENT_VERSION\" &>/dev/null; then\n    NO_AUTO_MERGE_REASONS+=' previous-version-not-released'\n\
+        \    echo \"Current version v$CURRENT_VERSION has not been released yet\"\n\
+        \  else\n    echo \"Current version v$CURRENT_VERSION has been released\"\n\
+        \  fi\n\n  # Check if golang version matches Core\n  CURRENT_GO_VERSION=$(grep\
+        \ '^go ' go.mod | awk '{print $2}')\n  echo \"Current Go version: $CURRENT_GO_VERSION\"\
+        \n  echo \"Target Go version (from Core): ${{ env.GO_VERSION }}\"\n\n  if\
+        \ [ \"$CURRENT_GO_VERSION\" != \"${{ env.GO_VERSION }}\" ]; then\n    NO_AUTO_MERGE_REASONS+='\
+        \ go-version-changed'\n    echo \"Go version differs from Core\"\n  fi\n\n\
+        \  # Check if changelog has new entries under \"next version\"\n  # Extract\
+        \ content between <!-- next version --> and <!-- previous-version -->\n  CHANGELOG_CONTENT=$(sed\
+        \ -n '/<!-- next version -->/,/<!-- previous-version -->/p' CHANGELOG.md |\
+        \ sed '1d;$d' | grep -v '^$' | grep -v '^##' || true)\n\n  if [ -n \"$CHANGELOG_CONTENT\"\
+        \ ]; then\n    NO_AUTO_MERGE_REASONS+=' changelog-non-empty'\n    echo \"\
+        Changelog has new entries:\"\n    echo \"$CHANGELOG_CONTENT\"\n  fi\nelse\n\
+        \  echo \"Minor versions match - Patch Version Updated\"\nfi\n\n# Perform\
+        \ automerge if conditions are met\nif [ -z \"$NO_AUTO_MERGE_REASONS\" ]; then\n\
+        \  echo \"Automerging PR #${{ env.PR_NUMBER }}\"\n  gh pr ready ${{ env.PR_NUMBER\
+        \ }}\n  gh pr merge ${{ env.PR_NUMBER }} --auto --squash\nelse\n  echo \"\
+        No auto merge possible due to:$NO_AUTO_MERGE_REASONS\"\n  echo \"Manual review\
+        \ required for PR #${{ env.PR_NUMBER }}\"\nfi\n"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Send notification to Slack
+      if: failure()
+      uses: slackapi/slack-github-action@91efab103c0de0a537f72a35f6b8cda0ee76bf0a
+      with:
+        webhook: ${{ secrets.OTELCOMM_BOTS_SLACK_HOOK }}
+        webhook-type: incoming-webhook
+        payload: 'text: ":rotating_light: update-otel workflow failed - https://github.com/${{
+          github.repository }}/actions/runs/${{ github.run_id }} :rotating_light:"
+
+          '
